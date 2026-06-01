@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vinpearl Agent System Flow & Tools Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --border-glow: rgba(99, 102, 241, 0.15);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.5);
+      --secondary: #06b6d4;
+      --accent: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --code-bg: #0b0f19;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg-dark) 70%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #a5b4fc, #818cf8, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 2.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--border-glow);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(99, 102, 241, 0.15);
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: #fff;
+    }
+
+    h2 span {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      width: 8px;
+      height: 24px;
+      display: inline-block;
+      border-radius: 4px;
+    }
+
+    /* Flowchart CSS and Styling */
+    .flowchart-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      position: relative;
+    }
+
+    .flow-node {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 1.2rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .flow-node:hover {
+      background: rgba(30, 41, 59, 0.8);
+      transform: translateY(-2px);
+      border-color: var(--primary);
+    }
+
+    .flow-node.active {
+      border-color: var(--secondary);
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+      background: rgba(6, 182, 212, 0.08);
+    }
+
+    .node-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .node-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .node-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      background: var(--primary);
+      color: #fff;
+      letter-spacing: 0.05em;
+    }
+
+    .node-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .flow-arrow {
+      align-self: center;
+      color: var(--primary);
+      font-size: 1.5rem;
+      font-weight: bold;
+      animation: pulse 2s infinite;
+    }
+
+    .branch-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    @media (max-width: 600px) {
+      .branch-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Tabs for Tool Guide */
+    .tab-container {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1rem;
+    }
+
+    .tab-button {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .tab-button:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+    }
+
+    .tab-button.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+    }
+
+    .tool-content {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .tool-content.active {
+      display: block;
+    }
+
+    .tool-info {
+      margin-bottom: 1.5rem;
+    }
+
+    .tool-param-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .tool-param-table th, .tool-param-table td {
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 0.8rem;
+      text-align: left;
+    }
+
+    .tool-param-table th {
+      background: rgba(255, 255, 255, 0.03);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .tool-param-table td.code-font {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--secondary);
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      color: var(--secondary);
+    }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      margin-top: 1rem;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: #a5b4fc;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* Sandbox Simulator */
+    .sandbox-panel {
+      margin-top: 2rem;
+      background: rgba(30, 41, 59, 0.3);
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    .sandbox-header {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sandbox-header svg {
+      color: var(--warning);
+    }
+
+    .sandbox-input-group {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .sandbox-input {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      color: #fff;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .sandbox-input:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+    }
+
+    .sandbox-btn {
+      background: var(--primary);
+      border: none;
+      border-radius: 8px;
+      padding: 0.8rem 1.5rem;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .sandbox-btn:hover {
+      background: #4f46e5;
+      transform: translateY(-1px);
+    }
+
+    .sandbox-output {
+      background: #060913;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      min-height: 120px;
+      white-space: pre-wrap;
+      color: #10b981;
+    }
+
+    .sandbox-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .suggestion-badge {
+      font-size: 0.8rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 0.3rem 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text-muted);
+    }
+
+    .suggestion-badge:hover {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* Key Animations */
+    @keyframes pulse {
+      0%, 100% {
+        transform: translateY(0);
+        opacity: 0.6;
+      }
+      50% {
+        transform: translateY(4px);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Flowchart Connection lines using SVGs */
+    .side-detail {
+      background: rgba(15, 23, 42, 0.4);
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-top: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .side-detail.active {
+      display: block;
+    }
+
+    .side-detail h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .side-detail p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Hệ Thống Đặt Phòng Vinpearl Nha Trang</h1>
+    <p>Tài liệu tương tác trực quan về luồng hoạt động hệ thống và các chức năng của Toolset</p>
+  </header>
+
+  <main>
+    <!-- Column 1: Interactive System Flowchart -->
+    <section class="card">
+      <h2><span></span>Luồng Hoạt Động Hệ Thống</h2>
+      <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+        Click vào từng bước trong quy trình để xem chi tiết cách hoạt động của thành phần đó.
+      </p>
+
+      <div class="flowchart-container">
+        <!-- Node 1 -->
+        <div class="flow-node active" onclick="showNodeDetail('user-input')">
+          <div class="node-header">
+            <div class="node-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              User Message
+            </div>
+            <div class="node-badge" style="background: var(--secondary)">Web UI</div>
+          </div>
+          <p class="node-desc">Khách hàng nhập câu hỏi vào chatbot ở trình duyệt web.</p>
+        </div>
+
+        <div class="flow-arrow">↓</div>
+
+        <!-- Node 2 -->
+        <div class="flow-node" onclick="showNodeDetail('guardrail-filter')">
+          <div class="node-header">
+            <div class="node-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              Guardrail Filter (Bộ Lọc Phạm Vi)
+            </div>
+            <div class="node-badge" style="background: var(--danger)">Guard</div>
+          </div>
+          <p class="node-desc">Kiểm tra ngay tại Backend xem câu hỏi có thuộc phạm vi đặt phòng không.</p>
+        </div>
+
+        <div class="flow-arrow">↓</div>
+
+        <!-- Node 3 -->
+        <div class="flow-node" onclick="showNodeDetail('router')">
+          <div class="node-header">
+            <div class="node-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+              Agent Router (Chọn Chế Độ)
+            </div>
+            <div class="node-badge" style="background: var(--warning)">Backend</div>
+          </div>
+          <p class="node-desc">Phân luồng dựa vào việc có tải được Local GGUF Model hay không.</p>
+        </div>
+
+        <div class="flow-arrow">↓</div>
+
+        <!-- Node 4 & 5 (Branch) -->
+        <div class="branch-container">
+          <div class="flow-node" onclick="showNodeDetail('rule-fallback')">
+            <div class="node-header">
+              <div class="node-title">Rule Fallback</div>
+            </div>
+            <p class="node-desc">Thuật toán khớp chuỗi regex cố định nhanh chóng.</p>
+          </div>
+          <div class="flow-node" onclick="showNodeDetail('react-agent')">
+            <div class="node-header">
+              <div class="node-title">ReAct LLM Agent</div>
+            </div>
+            <p class="node-desc">Vòng lặp Thought-Action-Observation của mô hình ngôn ngữ.</p>
+          </div>
+        </div>
+
+        <div class="flow-arrow">↓</div>
+
+        <!-- Node 6 -->
+        <div class="flow-node" onclick="showNodeDetail('toolset')">
+          <div class="node-header">
+            <div class="node-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+              Vinpearl Toolset (Công Cụ Hệ Thống)
+            </div>
+            <div class="node-badge" style="background: var(--accent)">Tools</div>
+          </div>
+          <p class="node-desc">5 tools hệ thống hỗ trợ tương tác cơ sở dữ liệu local.</p>
+        </div>
+      </div>
+
+      <!-- Node Details Container (Dynamic) -->
+      <div id="user-input-detail" class="side-detail active">
+        <h3>User Message (Tin nhắn người dùng)</h3>
+        <p>Giao diện Web gửi tin nhắn qua phương thức POST tới <code>/api/chat</code>. Người dùng có thể gửi câu hỏi ngắn chào hỏi, câu hỏi ngoài lề hoặc yêu cầu tìm phòng, giữ chỗ, xác nhận.</p>
+      </div>
+
+      <div id="guardrail-filter-detail" class="side-detail">
+        <h3>Guardrail Filter (Bộ Lọc Phạm Vi & Phân Loại Cố Định)</h3>
+        <p>Hệ thống sẽ thực hiện khớp chuỗi nhanh (Regex và so sánh bộ từ khóa) trước khi gọi LLM:</p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          <li><strong>Chào hỏi thuần túy:</strong> Nếu chỉ gửi "hello", "chào bạn", bot sẽ chào lại kèm theo mô tả phạm vi của mình ngay lập tức.</li>
+          <li><strong>Truy vấn mã phòng/giá cụ thể:</strong> Nếu hỏi giá phòng đã có trong danh sách tìm kiếm trước đó, hệ thống sẽ trích xuất số tiền/mã phòng và mô tả trực tiếp mà không cần chạy mô hình ngôn ngữ.</li>
+          <li><strong>Ngoài phạm vi:</strong> Nếu hỏi thời tiết, lịch sử, toán học... hệ thống sẽ trả về câu từ chối mẫu để bảo đảm tính chính xác 100%.</li>
+        </ul>
+      </div>
+
+      <div id="router-detail" class="side-detail">
+        <h3>Agent Router (Trình Điều Hướng Tác Vụ)</h3>
+        <p>Tùy thuộc vào sự hiện diện của tệp mô hình GGUF local <code>Phi-3-mini-4k-instruct-q4.gguf</code> tại thư mục <code>models/</code>:</p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          <li>Nếu có mô hình, bot sẽ khởi tạo <code>LocalProvider</code> và chạy vòng lặp suy luận ReAct.</li>
+          <li>Nếu không có mô hình, bot tự động hạ cấp xuống luồng xử lý bằng luật (RuleBasedVinpearlAgent) để kiểm thử và phát triển nhanh.</li>
+        </ul>
+      </div>
+
+      <div id="rule-fallback-detail" class="side-detail">
+        <h3>Rule Fallback (Bản Rút Gọn Bằng Luật)</h3>
+        <p>Nếu ở chế độ Rule-based, hệ thống tự động bóc tách các trường thông tin thông qua biểu thức chính quy (Regex):</p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          <li>Trích xuất ngày tháng (định dạng YYYY-MM-DD hoặc DD/MM/YYYY)</li>
+          <li>Trích xuất số lượng người lớn, trẻ em.</li>
+          <li>Trích xuất giá tối đa (dưới 6 triệu, không quá 10 triệu...).</li>
+          <li>Tự động gọi các API local trong Toolset tương tự như Agent nhưng theo kịch bản cứng vững.</li>
+        </ul>
+      </div>
+
+      <div id="react-agent-detail" class="side-detail">
+        <h3>ReAct LLM Agent (Tác Tử Suy Luận Thông Minh)</h3>
+        <p>Sử dụng mô hình ngôn ngữ kết hợp với định dạng phản hồi quy chuẩn:</p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          <li><strong>Thought:</strong> LLM viết ra suy nghĩ để chuẩn bị bước tiếp theo.</li>
+          <li><strong>Action:</strong> LLM phát ra lời gọi hàm (ví dụ: <code>search_vinpearl_packages(location="Nha Trang", ...)</code>).</li>
+          <li><strong>Observation:</strong> Backend bắt được cú pháp Action, chạy code Python thật và đưa kết quả trả lại vào prompt của LLM.</li>
+          <li>Quá trình lặp lại tối đa 6 bước trước khi kết luận bằng <strong>Final Answer:</strong>.</li>
+        </ul>
+      </div>
+
+      <div id="toolset-detail" class="side-detail">
+        <h3>Vinpearl Toolset (Tệp tin Công Cụ Đăng Ký)</h3>
+        <p>Đây là tập hợp các API thật kết nối trực tiếp với Cơ sở dữ liệu Inventory dạng JSON. Tác tử LLM hoặc Công cụ so khớp luật đều giao tiếp qua các phương thức Python cụ thể tại đây để cập nhật số lượng phòng và lấy kết quả trả về cho khách.</p>
+      </div>
+
+    </section>
+
+    <!-- Column 2: Tool Guide & Sandbox -->
+    <section class="card">
+      <h2><span></span>Chi Tiết Cách Làm Từng Tool</h2>
+      
+      <div class="tab-container">
+        <button class="tab-button active" onclick="switchToolTab('search')">search_packages</button>
+        <button class="tab-button" onclick="switchToolTab('filter')">filter_packages</button>
+        <button class="tab-button" onclick="switchToolTab('prepare')">prepare_booking</button>
+        <button class="tab-button" onclick="switchToolTab('confirm')">confirm_booking</button>
+        <button class="tab-button" onclick="switchToolTab('itinerary')">generate_itinerary</button>
+      </div>
+
+      <!-- Tab 1: Search -->
+      <div id="tool-search" class="tool-content active">
+        <div class="tool-info">
+          <p><strong>Mục đích:</strong> Tìm phòng hoặc combo trống phù hợp tại Vinpearl Nha Trang dựa vào số lượng người lớn, trẻ em và thời gian lưu trú.</p>
+          <table class="tool-param-table">
+            <tr><th>Tham số</th><th>Kiểu dữ liệu</th><th>Mô tả</th></tr>
+            <tr><td class="code-font">location</td><td>str</td><td>Địa điểm (Nha Trang)</td></tr>
+            <tr><td class="code-font">check_in</td><td>str (YYYY-MM-DD)</td><td>Ngày nhận phòng</td></tr>
+            <tr><td class="code-font">check_out</td><td>str (YYYY-MM-DD)</td><td>Ngày trả phòng</td></tr>
+            <tr><td class="code-font">adults</td><td>int</td><td>Số người lớn</td></tr>
+            <tr><td class="code-font">children</td><td>int</td><td>Số trẻ em</td></tr>
+          </table>
+        </div>
+        <p><strong>Cách thức hoạt động bên trong:</strong></p>
+        <ol style="margin-left: 1.5rem; margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          <li>Duyệt qua tất cả resorts và các phòng nghỉ trong tệp JSON.</li>
+          <li>Kiểm tra xem số lượng người có vượt sức chứa tiêu chuẩn của phòng không.</li>
+          <li>Quét qua các ngày nằm giữa <code>check_in</code> và <code>check_out</code> để kiểm tra tính khả dụng (phòng đó còn trống &gt; 0 trong tất cả các ngày đó không).</li>
+          <li>Tính tổng giá tiền phòng (áp dụng giá ngày thường <code>base_price_per_night</code> và giá cuối tuần <code>weekend_price_per_night</code> cho các ngày Thứ 6, Thứ 7).</li>
+          <li>Sắp xếp kết quả tăng dần theo tổng giá và lưu kết quả vào danh sách bộ nhớ tạm <code>self.last_search_results</code>.</li>
+        </ol>
+        <pre><code>def search_vinpearl_packages(self, location, check_in, check_out, adults, children):
+    nights = _date_range(check_in, check_out)
+    results = []
+    # Quét resorts, kiểm tra sức chứa và trạng thái phòng từng ngày...
+    # Tính tổng giá dựa trên weekday >= 4 (cuối tuần)
+    # Lưu vào self.last_search_results để hỗ trợ lọc (filter) về sau.</code></pre>
+      </div>
+
+      <!-- Tab 2: Filter -->
+      <div id="tool-filter" class="tool-content">
+        <div class="tool-info">
+          <p><strong>Mục đích:</strong> Lọc danh sách phòng tìm được gần nhất theo giá tối đa và các dịch vụ tiện ích đi kèm (ví dụ: VinWonders, Ăn 3 bữa).</p>
+          <table class="tool-param-table">
+            <tr><th>Tham số</th><th>Kiểu dữ liệu</th><th>Mô tả</th></tr>
+            <tr><td class="code-font">includes</td><td>list[str]</td><td>Các dịch vụ cần có (ví dụ: ["VinWonders"])</td></tr>
+            <tr><td class="code-font">max_price</td><td>int | None</td><td>Ngưỡng giá tối đa (VND)</td></tr>
+          </table>
+        </div>
+        <p><strong>Cách thức hoạt động bên trong:</strong></p>
+        <ol style="margin-left: 1.5rem; margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          <li>Lấy dữ liệu nguồn từ <code>self.last_search_results</code> (kết quả của lượt tìm kiếm gần nhất).</li>
+          <li>Chuẩn hóa chữ viết của các tiện ích và so khớp để đảm bảo tất cả các tiện ích bắt buộc trong <code>includes</code> đều có mặt trong trường <code>includes</code> của phòng đó.</li>
+          <li>Nếu có cung cấp <code>max_price</code>, loại bỏ các phòng có tổng giá vượt quá giới hạn này.</li>
+          <li>Lưu kết quả đã lọc vào <code>self.last_filtered_results</code> để chuẩn bị cho bước đặt phòng tiếp theo.</li>
+        </ol>
+        <pre><code>def filter_packages(self, includes, max_price=None):
+    source = self.last_search_results
+    results = []
+    for package in source:
+        # Khớp chữ viết thường không dấu
+        # Kiểm tra tổng giá <= max_price
+    self.last_filtered_results = results</code></pre>
+      </div>
+
+      <!-- Tab 3: Prepare -->
+      <div id="tool-prepare" class="tool-content">
+        <div class="tool-info">
+          <p><strong>Mục đích:</strong> Tạo yêu cầu đặt phòng tạm tính (giữ chỗ) cho gói phòng đã chọn để chờ khách xác nhận lần cuối.</p>
+          <table class="tool-param-table">
+            <tr><th>Tham số</th><th>Kiểu dữ liệu</th><th>Mô tả</th></tr>
+            <tr><td class="code-font">package_code</td><td>str</td><td>Mã gói phòng cần giữ (ví dụ: FAM-SUITE-VW)</td></tr>
+            <tr><td class="code-font">guest_name</td><td>str</td><td>Tên khách hàng đặt phòng</td></tr>
+          </table>
+        </div>
+        <p><strong>Cách thức hoạt động bên trong:</strong></p>
+        <ol style="margin-left: 1.5rem; margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          <li>Tìm gói phòng trong <code>self.last_filtered_results</code> hoặc <code>self.last_search_results</code> dựa vào <code>package_code</code>.</li>
+          <li>Kiểm tra trạng thái phòng hiện tại trực tiếp từ file dữ liệu gốc để chắc chắn phòng vẫn còn trống.</li>
+          <li>Tạo một mã đặt phòng tạm thời dưới dạng <code>VP-YYYYMMDDHHMMSS</code>.</li>
+          <li>Lưu thông tin tạm thời này vào <code>self.pending_booking</code> kèm theo trạng thái <code>pending_confirmation</code>.</li>
+          <li>Trả về thông điệp thông báo đã tạo giữ chỗ và yêu cầu LLM hỏi khách hàng có muốn chốt/xác nhận đặt hay không.</li>
+        </ol>
+        <pre><code>def prepare_booking(self, package_code, guest_name):
+    package = self._find_package(package_code)
+    # Kiểm tra số lượng trống mới nhất...
+    booking_id = f"VP-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    self.pending_booking = {
+        "booking_id": booking_id,
+        "status": "pending_confirmation",
+        "package": package
+    }</code></pre>
+      </div>
+
+      <!-- Tab 4: Confirm -->
+      <div id="tool-confirm" class="tool-content">
+        <div class="tool-info">
+          <p><strong>Mục đích:</strong> Xác nhận đặt phòng chính thức, tiến hành trừ phòng trong kho dữ liệu và ghi nhận booking thành công.</p>
+          <table class="tool-param-table">
+            <tr><th>Tham số</th><th>Kiểu dữ liệu</th><th>Mô tả</th></tr>
+            <tr><td class="code-font">booking_id</td><td>str</td><td>Mã booking tạm thời cần xác nhận</td></tr>
+            <tr><td class="code-font">user_message</td><td>str</td><td>Đoạn chat chứa ý định xác nhận của khách</td></tr>
+          </table>
+        </div>
+        <p><strong>Cách thức hoạt động bên trong:</strong></p>
+        <ol style="margin-left: 1.5rem; margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          <li>Xác thực xem có tồn tại <code>self.pending_booking</code> với mã tương ứng không.</li>
+          <li>Kiểm tra xem trong tin nhắn <code>user_message</code> của người dùng có chứa từ khóa xác nhận thuộc danh sách <code>CONFIRM_KEYWORDS</code> (như "xác nhận đặt", "đồng ý", "chốt", "confirm") hay không.</li>
+          <li>Nếu đồng ý, kiểm tra số phòng trống thực tế một lần nữa.</li>
+          <li>Trừ số lượng phòng khả dụng (available) đi 1 đơn vị cho tất cả các ngày lưu trú trong cơ sở dữ liệu và chuyển trạng thái phòng sang <code>sold_out</code> hoặc <code>limited</code> nếu đạt ngưỡng.</li>
+          <li>Ghi đè cập nhật lại file JSON cơ sở dữ liệu local (<code>_persist_inventory</code>), chuyển booking tạm vào danh sách <code>confirmed_bookings</code>, và giải phóng <code>pending_booking</code> về <code>None</code>.</li>
+        </ol>
+        <pre><code>def confirm_booking(self, booking_id, user_message):
+    # Khớp CONFIRM_KEYWORDS trong user_message
+    # Giảm số lượng trống trong tệp JSON cho từng ngày lưu trú
+    self._decrement_inventory(booking['package'])
+    self._persist_inventory() # Ghi đè cập nhật file JSON database
+    self.confirmed_bookings.append(booking)</code></pre>
+      </div>
+
+      <!-- Tab 5: Itinerary -->
+      <div id="tool-itinerary" class="tool-content">
+        <div class="tool-info">
+          <p><strong>Mục đích:</strong> Tạo lịch trình du lịch gợi ý cho khách hàng nghỉ dưỡng dựa trên số lượng ngày và các hoạt động vui chơi chính.</p>
+          <table class="tool-param-table">
+            <tr><th>Tham số</th><th>Kiểu dữ liệu</th><th>Mô tả</th></tr>
+            <tr><td class="code-font">duration_days</td><td>int</td><td>Số ngày của chuyến đi (số đêm + 1)</td></tr>
+            <tr><td class="code-font">location</td><td>str</td><td>Địa điểm khách sạn nghỉ dưỡng</td></tr>
+            <tr><td class="code-font">key_activities</td><td>list[str]</td><td>Các hoạt động chính (như VinWonders, xem Tata Show)</td></tr>
+          </table>
+        </div>
+        <p><strong>Cách thức hoạt động bên trong:</strong></p>
+        <ol style="margin-left: 1.5rem; margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          <li>Phân tích độ dài chuyến đi để dựng khung mẫu lịch trình (1 ngày, 2 ngày hoặc 3 ngày).</li>
+          <li>Đưa các hoạt động nổi bật vào các khoảng thời gian thích hợp (Ví dụ: 19:30 xem Tata Show nếu trong danh sách hoạt động có chứa "tata").</li>
+          <li>Ghép nối các chuỗi văn bản thành một lịch trình chi tiết từng ngày và trả về để đưa vào lời phản hồi của Chatbot.</li>
+        </ol>
+        <pre><code>def generate_itinerary(self, duration_days, location, key_activities):
+    # Tạo chuỗi văn bản mô tả hoạt động từng ngày dựa trên duration_days
+    # Đưa các hoạt động nổi bật như VinWonders, Tata Show vào các ngày phù hợp.</code></pre>
+      </div>
+
+      <!-- Interactive Sandbox Simulator -->
+      <div class="sandbox-panel">
+        <div class="sandbox-header">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          Hộp Thử Nghiệm Mô Phỏng Chatbot (Sandbox)
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+          Nhập câu hỏi để mô phỏng cách hệ thống xử lý bộ lọc phạm vi và chào hỏi:
+        </p>
+
+        <div class="sandbox-suggestions">
+          <span class="suggestion-badge" onclick="setSandboxInput('hello')">hello</span>
+          <span class="suggestion-badge" onclick="setSandboxInput('Thời tiết Nha Trang hôm nay thế nào?')">Thời tiết Nha Trang hôm nay thế nào?</span>
+          <span class="suggestion-badge" onclick="setSandboxInput('Hà Nội có bao nhiêu quận?')">Hà Nội có bao nhiêu quận?</span>
+          <span class="suggestion-badge" onclick="setSandboxInput('Phòng 28.400.000 VND là phòng nào?')">Phòng 28.400.000 VND là phòng nào?</span>
+          <span class="suggestion-badge" onclick="setSandboxInput('Tìm phòng cho 2 người lớn')">Tìm phòng cho 2 người lớn</span>
+        </div>
+
+        <div class="sandbox-input-group">
+          <input type="text" id="sandbox-input" class="sandbox-input" placeholder="Nhập câu hỏi thử nghiệm...">
+          <button class="sandbox-btn" onclick="runSandboxSimulation()">Thử ngay</button>
+        </div>
+
+        <div id="sandbox-output" class="sandbox-output">Nhấn nút "Thử ngay" hoặc chọn câu mẫu phía trên để xem luồng chạy thực tế...</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Show Node Details on Flowchart Click
+    function showNodeDetail(nodeId) {
+      // Remove active class from all nodes
+      document.querySelectorAll('.flow-node').forEach(node => {
+        node.classList.remove('active');
+      });
+      // Add active class to clicked node
+      event.currentTarget.classList.add('active');
+
+      // Hide all details
+      document.querySelectorAll('.side-detail').forEach(detail => {
+        detail.classList.remove('active');
+      });
+      // Show clicked node detail
+      const targetDetail = document.getElementById(nodeId + '-detail');
+      if (targetDetail) {
+        targetDetail.classList.add('active');
+      }
+    }
+
+    // Switch Tool Tabs
+    function switchToolTab(toolKey) {
+      // Deactivate all tab buttons
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      // Activate clicked button
+      event.currentTarget.classList.add('active');
+
+      // Hide all tool contents
+      document.querySelectorAll('.tool-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      // Show corresponding content
+      document.getElementById('tool-' + toolKey).classList.add('active');
+    }
+
+    // Set simulation input
+    function setSandboxInput(text) {
+      document.getElementById('sandbox-input').value = text;
+      runSandboxSimulation();
+    }
+
+    // Normalize text helper for simulation
+    function normalize(text) {
+      const replacements = {
+        "á": "a", "à": "a", "ả": "a", "ã": "a", "ạ": "a", "ă": "a", "ắ": "a", "ằ": "a", "ẳ": "a", "ẵ": "a", "ặ": "a", "â": "a", "ấ": "a", "ầ": "a", "ẩ": "a", "ẫ": "a", "ậ": "a",
+        "đ": "d", "é": "e", "è": "e", "ẻ": "e", "ẽ": "e", "ẹ": "e", "ê": "e", "ế": "e", "ề": "e", "ể": "e", "ễ": "e", "ệ": "e",
+        "í": "i", "ì": "i", "ỉ": "i", "ĩ": "i", "ị": "i", "ó": "o", "ò": "o", "ỏ": "o", "õ": "o", "ọ": "o", "ô": "o", "ố": "o", "ồ": "o", "ổ": "o", "ỗ": "o", "ộ": "o", "ơ": "o", "ớ": "o", "ờ": "o", "ở": "o", "ỡ": "o", "ợ": "o",
+        "ú": "u", "ù": "u", "ủ": "u", "ũ": "u", "ụ": "u", "ư": "u", "ứ": "u", "ừ": "u", "ử": "u", "ữ": "u", "ự": "u", "ý": "y", "ỳ": "y", "ỷ": "y", "ỹ": "y", "ỵ": "y"
+      };
+      let result = text.toLowerCase();
+      for (let key in replacements) {
+        result = result.replaceAll(key, replacements[key]);
+      }
+      return result;
+    }
+
+    // Run Simulator
+    function runSandboxSimulation() {
+      const input = document.getElementById('sandbox-input').value.trim();
+      const output = document.getElementById('sandbox-output');
+      if (!input) {
+        output.textContent = "Vui lòng nhập câu hỏi.";
+        return;
+      }
+
+      const normalized = normalize(input).trim();
+      const cleaned = normalized.replace(/[^\w\s]/g, " ");
+      const words = new Set(cleaned.split(/\s+/));
+      
+      output.textContent = `[1] Nhận tin nhắn: "${input}"\n`;
+      output.textContent += `[2] Chuẩn hóa chuỗi: "${normalized}"\n\n`;
+
+      // 1. Check Greeting
+      const greetings = ["chao", "hello", "hi", "helo", "xin chao", "chao ban", "chao ad", "chao bot"];
+      let isPureGreeting = false;
+      if (greetings.includes(normalized)) {
+        isPureGreeting = true;
+      } else {
+        const wordsArr = normalized.split(/\s+/);
+        if (wordsArr.length <= 2 && ["chao", "hello", "hi", "helo", "xin"].some(g => wordsArr.includes(g))) {
+          const bookingKeywords = ["phong", "dat", "book", "tim", "gia", "combo"];
+          if (!bookingKeywords.some(k => normalized.includes(k))) {
+            isPureGreeting = true;
+          }
+        }
+      }
+
+      if (isPureGreeting) {
+        output.textContent += `→ PHÁT HIỆN: Câu chào hỏi xã giao.\n`;
+        output.textContent += `→ HÀNH ĐỘNG: Bỏ qua LLM, trả về câu chào định hướng ngay lập tức.\n\n`;
+        output.textContent += `[KẾT QUẢ]: "Chào bạn! Tôi là trợ lý ảo chuyên hỗ trợ tìm phòng và đặt phòng tại Vinpearl Nha Trang. Bạn cần hỗ trợ tìm phòng hay đặt phòng cho thời gian nào ạ?"`;
+        return;
+      }
+
+      // 2. Check specific price lookup
+      let matchedPrice = null;
+      if (normalized.includes("28.400.000") || normalized.includes("28400000")) {
+        matchedPrice = 28400000;
+      } else if (normalized.includes("9.600.000") || normalized.includes("9600000")) {
+        matchedPrice = 9600000;
+      }
+
+      if (matchedPrice) {
+        output.textContent += `→ PHÁT HIỆN: Truy vấn thông tin theo mức giá (${matchedPrice.toLocaleString('vi-VN')} VND).\n`;
+        output.textContent += `→ HÀNH ĐỘNG: Truy xuất trực tiếp từ danh sách kết quả lưu tạm.\n\n`;
+        if (matchedPrice === 28400000) {
+          output.textContent += `[KẾT QUẢ]: "Phong co gia 28.400.000 VND trong danh sach lua chon phu hop gan nhat la:\nGoi VILLA-3BR-VW: Villa 3 phong ngu kem VinWonders tai Vinpearl Discovery Nha Trang | tong gia 28.400.000 VND | Bao gom: Phong o + An sang buffet + Ve VinWonders + Xe dien noi khu | Suc chua: 6 lon, 3 tre em."`;
+        } else {
+          output.textContent += `[KẾT QUẢ]: "Phong co gia 9.600.000 VND trong danh sach lua chon phu hop gan nhat la:\nGoi DLX-SEAVIEW-BB: Deluxe huong bien tai Vinpearl Resort Nha Trang | tong gia 9.600.000 VND | Bao gom: Phong o + An sang buffet | Suc chua: 2 lon, 2 tre em."`;
+        }
+        return;
+      }
+
+      // 3. Relevance check
+      let isRelevant = false;
+      const packageCodes = input.toUpperCase().match(/\b([A-Z0-9]+(?:-[A-Z0-9]+)+)\b/);
+      if (packageCodes) {
+        isRelevant = true;
+      } else if (/\b\d[\d.,]{5,}\b/.test(normalized) || normalized.includes("trieu") || normalized.includes("million")) {
+        isRelevant = true;
+      } else {
+        const singleWordKeywords = new Set([
+          "phong", "dat", "book", "tim", "gia", "tien", "combo", "goi",
+          "package", "villa", "suite", "deluxe", "resort", "hotel",
+          "ngay", "dem", "khach", "confirm", "ok", "oke", "yep", "yes",
+          "tata", "buffet", "vnd"
+        ]);
+        for (let word of words) {
+          if (singleWordKeywords.has(word)) {
+            isRelevant = true;
+            break;
+          }
+        }
+        if (!isRelevant) {
+          const multiWordPhrases = [
+            "check in", "check_in", "check out", "check_out", 
+            "nguoi lon", "tre em", "khach san", "vinwonders", "vin wonders",
+            "vui choi", "an sang", "an ba bua", "chi phi", "tra cuu", "kiem tra"
+          ];
+          for (let phrase of multi_word_phrases) {
+            if (normalized.includes(phrase)) {
+              isRelevant = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (!isRelevant) {
+        output.textContent += `→ PHÁT HIỆN: Yêu cầu ngoài phạm vi hỗ trợ (Lọc vi phạm).\n`;
+        output.textContent += `→ HÀNH ĐỘNG: Bỏ qua xử lý Agent, trả về câu từ chối lịch sự mẫu để bảo mật phạm vi.\n\n`;
+        output.textContent += `[KẾT QUẢ]: "Xin lỗi, tôi là trợ lý ảo chuyên hỗ trợ tìm phòng và đặt phòng tại Vinpearl Nha Trang. Tôi không thể trả lời các câu hỏi ngoài phạm vi này."`;
+      } else {
+        output.textContent += `→ PHÁT HIỆN: Yêu cầu ĐÚNG PHẠM VI (Đặt phòng/Tìm phòng).\n`;
+        output.textContent += `→ HÀNH ĐỘNG: Chuyển yêu cầu vào Agent để kích hoạt quy trình tìm kiếm/giữ chỗ.\n\n`;
+        output.textContent += `[KẾT QUẢ TRUNG GIAN]: Agent bắt đầu gọi search_vinpearl_packages hoặc các tool tương ứng...`;
+      }
+    }
+  </script>
+</body>
+</html>

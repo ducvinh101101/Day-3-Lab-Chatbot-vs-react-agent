@@ -1,0 +1,220 @@
+{
+  "currency": "VND",
+  "resorts": [
+    {
+      "id": "vpr-nt",
+      "name": "Vinpearl Resort Nha Trang",
+      "location": "Hon Tre, Nha Trang",
+      "rooms": [
+        {
+          "code": "DLX-SEAVIEW-BB",
+          "name": "Deluxe huong bien",
+          "capacity_adults": 2,
+          "capacity_children": 2,
+          "base_price_per_night": 4200000,
+          "weekend_price_per_night": 4800000,
+          "includes": [
+            "Phong o",
+            "An sang buffet"
+          ],
+          "status_by_date": {
+            "2026-06-05": {
+              "status": "limited",
+              "available": 2
+            },
+            "2026-06-06": {
+              "status": "available",
+              "available": 4
+            },
+            "2026-06-07": {
+              "status": "available",
+              "available": 5
+            },
+            "2026-06-12": {
+              "status": "available",
+              "available": 5
+            },
+            "2026-06-13": {
+              "status": "limited",
+              "available": 1
+            },
+            "2026-06-14": {
+              "status": "available",
+              "available": 3
+            }
+          }
+        },
+        {
+          "code": "FAM-SUITE-VW",
+          "name": "Family Suite kem VinWonders",
+          "capacity_adults": 2,
+          "capacity_children": 2,
+          "base_price_per_night": 6100000,
+          "weekend_price_per_night": 6900000,
+          "includes": [
+            "Phong o",
+            "An sang buffet",
+            "Ve VinWonders"
+          ],
+          "status_by_date": {
+            "2026-06-05": {
+              "status": "available",
+              "available": 2
+            },
+            "2026-06-06": {
+              "status": "sold_out",
+              "available": 0
+            },
+            "2026-06-07": {
+              "status": "available",
+              "available": 3
+            },
+            "2026-06-12": {
+              "status": "sold_out",
+              "available": 0
+            },
+            "2026-06-13": {
+              "status": "sold_out",
+              "available": 0
+            },
+            "2026-06-14": {
+              "status": "limited",
+              "available": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "vprs-ntb",
+      "name": "Vinpearl Resort & Spa Nha Trang Bay",
+      "location": "Hon Tre, Nha Trang",
+      "rooms": [
+        {
+          "code": "VILLA-2BR-FB-VW",
+          "name": "Villa 2 phong ngu",
+          "capacity_adults": 4,
+          "capacity_children": 2,
+          "base_price_per_night": 9500000,
+          "weekend_price_per_night": 10800000,
+          "includes": [
+            "Phong o",
+            "An 3 bua",
+            "Ve VinWonders"
+          ],
+          "status_by_date": {
+            "2026-06-05": {
+              "status": "sold_out",
+              "available": 0
+            },
+            "2026-06-06": {
+              "status": "sold_out",
+              "available": 0
+            },
+            "2026-06-07": {
+              "status": "available",
+              "available": 2
+            },
+            "2026-06-12": {
+              "status": "available",
+              "available": 2
+            },
+            "2026-06-13": {
+              "status": "available",
+              "available": 2
+            },
+            "2026-06-14": {
+              "status": "available",
+              "available": 2
+            }
+          }
+        },
+        {
+          "code": "EXEC-SUITE-FB",
+          "name": "Executive Suite",
+          "capacity_adults": 2,
+          "capacity_children": 1,
+          "base_price_per_night": 7200000,
+          "weekend_price_per_night": 8200000,
+          "includes": [
+            "Phong o",
+            "An 3 bua"
+          ],
+          "status_by_date": {
+            "2026-06-05": {
+              "status": "available",
+              "available": 3
+            },
+            "2026-06-06": {
+              "status": "available",
+              "available": 3
+            },
+            "2026-06-07": {
+              "status": "available",
+              "available": 3
+            },
+            "2026-06-12": {
+              "status": "limited",
+              "available": 1
+            },
+            "2026-06-13": {
+              "status": "sold_out",
+              "available": 0
+            },
+            "2026-06-14": {
+              "status": "available",
+              "available": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "vpd-nt",
+      "name": "Vinpearl Discovery Nha Trang",
+      "location": "Hon Tre, Nha Trang",
+      "rooms": [
+        {
+          "code": "VILLA-3BR-VW",
+          "name": "Villa 3 phong ngu kem VinWonders",
+          "capacity_adults": 6,
+          "capacity_children": 3,
+          "base_price_per_night": 12500000,
+          "weekend_price_per_night": 14200000,
+          "includes": [
+            "Phong o",
+            "An sang buffet",
+            "Ve VinWonders",
+            "Xe dien noi khu"
+          ],
+          "status_by_date": {
+            "2026-06-05": {
+              "status": "available",
+              "available": 2
+            },
+            "2026-06-06": {
+              "status": "available",
+              "available": 2
+            },
+            "2026-06-07": {
+              "status": "available",
+              "available": 2
+            },
+            "2026-06-12": {
+              "status": "limited",
+              "available": 1
+            },
+            "2026-06-13": {
+              "status": "limited",
+              "available": 1
+            },
+            "2026-06-14": {
+              "status": "available",
+              "available": 2
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

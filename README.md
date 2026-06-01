@@ -37,6 +37,31 @@ DEFAULT_PROVIDER=local
 LOCAL_MODEL_PATH=./models/Phi-3-mini-4k-instruct-q4.gguf
 ```
 
+### 4. Run the Vinpearl ReAct Agent demo
+After placing the GGUF model at `LOCAL_MODEL_PATH`, run:
+```bash
+python run_vinpearl_agent.py
+```
+
+The demo uses the local model plus mock Vinpearl tools to search packages,
+filter packages that include VinWonders, then generate a 3-day 2-night
+itinerary for the selected package.
+
+### 5. Run the Vinpearl chatbot UI
+Start the local chatbot server:
+```bash
+python vinpearl_chatbot_app.py
+```
+
+Open `http://127.0.0.1:8000` in your browser. The UI shows the chat, local
+room inventory, nightly prices, date-level room status, pending booking, and
+confirmed bookings. If `LOCAL_MODEL_PATH` points to an existing GGUF file, the
+server uses the local ReAct agent. If the model is not available yet, it falls
+back to a deterministic local booking flow for testing.
+
+The confirmation tool is guarded: a booking is only finalized after the user
+explicitly says they confirm/agree/chot dat/xac nhan dat.
+
 ## 🎯 Lab Objectives
 
 1.  **Baseline Chatbot**: Observe the limitations of a standard LLM when faced with multi-step reasoning.

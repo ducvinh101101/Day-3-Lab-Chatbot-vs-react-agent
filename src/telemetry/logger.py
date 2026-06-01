@@ -12,9 +12,10 @@ class IndustryLogger:
     def __init__(self, name: str = "AI-Lab-Agent", log_dir: str = "logs"):
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.INFO)
-        
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
+        if self.logger.handlers:
+            return
+
+        os.makedirs(log_dir, exist_ok=True)
 
         # File Handler (JSON)
         log_file = os.path.join(log_dir, f"{datetime.now().strftime('%Y-%m-%d')}.log")

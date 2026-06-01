@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vinpearl Nha Trang Booking Agent</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="chat-panel" aria-label="Chatbot dat phong Vinpearl">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Vinpearl Nha Trang</p>
+            <h1>Booking Agent</h1>
+          </div>
+          <span id="modeBadge" class="badge">Loading</span>
+        </header>
+
+        <div id="messages" class="messages" aria-live="polite"></div>
+
+        <form id="chatForm" class="composer">
+          <label for="messageInput">Tin nhan</label>
+          <textarea
+            id="messageInput"
+            rows="3"
+            placeholder="Tim phong 3 ngay 2 dem cho 2 nguoi lon, 2 tre em tu 2026-06-05 den 2026-06-07, co VinWonders"
+          ></textarea>
+          <button id="sendButton" type="submit">Gui</button>
+        </form>
+      </section>
+
+      <aside class="side-panel" aria-label="Du lieu phong local">
+        <section class="status-strip">
+          <div>
+            <span class="dot available"></span>
+            Available
+          </div>
+          <div>
+            <span class="dot limited"></span>
+            Limited
+          </div>
+          <div>
+            <span class="dot sold_out"></span>
+            Sold out
+          </div>
+        </section>
+
+        <section class="booking-box">
+          <h2>Booking dang cho</h2>
+          <div id="pendingBooking" class="muted">Chua co booking tam.</div>
+        </section>
+
+        <section>
+          <h2>Phong va gia local</h2>
+          <div id="inventory" class="inventory"></div>
+        </section>
+      </aside>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
